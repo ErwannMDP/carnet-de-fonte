@@ -10,7 +10,7 @@
 <title>Carnet de fonte</title>
 <script src="seed.js"></script>
 <script src="store.js"></script>
-<script>if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js'));</script><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<script>if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()));</script><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Carnet de fonte</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
@@ -264,7 +264,7 @@ nav.tabs .wrap{grid-template-columns:repeat(4,1fr)!important}
 <div class="wrap" id="app"><p class="empty">Chargement du carnet…</p></div>
 <div id="toast" class="toast" hidden></div>
 
-<script>
+<script type="text/cdf-app" id="cdf-app">
 const CATS={
   push:{label:'Push',sub:'Pecs · Triceps · Épaules',plate:'25'},
   pull:{label:'Pull',sub:'Dos · Biceps',plate:'20'},
@@ -272,7 +272,7 @@ const CATS={
   cardio:{label:'Cardio',sub:'Fin de séance',plate:'5'}
 };
 const FEELS=[['facile','Facile'],['ok','OK'],['dur','Dur'],['echec','Échec']];
-const DRAFT_KEY='carnet-fonte-draft';
+const DRAFT_KEY='carnet-fonte-draft:'+((window.CDF_PROFILE||{}).id||'erwann');
 
 let db=null, noDb=false, exercises=[], sessions=[], loaded={ex:false,se:false};
 let view={tab:'home', openSession:null, confirmDel:null, exCat:'push', editId:null, confirmArchive:null, adding:false};
@@ -335,13 +335,13 @@ function softRender(){
 function render(){
   if(view.tab==='workout'&&draft){app.innerHTML=workoutView();afterWorkoutRender();return}
   let body='';
-  if(noDb&&!loaded.ex)body=`<div class="empty"><p>Le stockage du carnet n'est pas disponible dans cette vue.</p><p>Ouvre l'appli depuis claude.ai en étant connecté pour retrouver tes séances.</p></div>`;
+  if(noDb&&!loaded.ex)body=`<div class="empty"><p>Le stockage du carnet n'est pas disponible.</p><p>Vérifie que la navigation privée est désactivée dans Safari.</p></div>`;
   else if(!loaded.ex||!loaded.se)body='<p class="empty">Chargement du carnet…</p>';
   else if(view.tab==='home')body=homeView();
   else if(view.tab==='history')body=historyView();
   else if(view.tab==='charts')body=chartsView();
   else if(view.tab==='exercises')body=exercisesView();
-  app.innerHTML=`<header class="top"><div class="brand cond">Carnet de fonte<small>Suivi des séances</small></div></header>${body}`+navHtml();
+  app.innerHTML=`<header class="top"><div class="brand cond">Carnet de fonte<small>Suivi des séances · ${(window.CDF_PROFILE||{}).name||''}</small></div><button class="btn sm" data-cdf-switch style="flex:none;white-space:nowrap" aria-label="Changer de compte">⇄ Changer</button></header>${body}`+navHtml();
   if(view.tab==='charts')bindCharts();
 }
 function navHtml(){

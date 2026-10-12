@@ -1,12 +1,12 @@
 /* Carnet de fonte : fonctionnement hors ligne.
    Les pages sont prises sur le réseau quand il y en a (pour recevoir les mises à jour),
    sinon dans le cache. Changez VERSION à chaque mise à jour pour forcer un rafraîchissement. */
-const VERSION = 'cdf-v1';
+const VERSION = 'cdf-v3';
 const CORE = ['./', 'index.html', 'store.js', 'seed.js', 'manifest.webmanifest',
   'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(VERSION).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(VERSION).then(c => c.addAll(CORE.map(u => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', e => {
@@ -32,7 +32,7 @@ self.addEventListener('fetch', e => {
   }
 
   // Fichiers de l'app : réseau d'abord, cache si hors ligne
-  e.respondWith(fetch(req).then(res => {
+  e.respondWith(fetch(req, { cache: 'no-cache' }).then(res => {
     if (res.ok) { const copy = res.clone(); caches.open(VERSION).then(c => c.put(req, copy)); }
     return res;
   }).catch(() => caches.match(req).then(hit => hit || caches.match('index.html'))));
