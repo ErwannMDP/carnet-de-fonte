@@ -18,7 +18,7 @@
 :root{
   --bg:#EDEFEB; --surface:#FFFFFF; --sunk:#E3E6E1; --ink:#1A1E23; --muted:#5B636D; --line:#D3D8D1;
   --push:#C4342A; --pull:#2356A3; --legs:#D6A01A; --cardio:#2E8750;
-  --push-soft:#F6E1DE; --pull-soft:#DFE7F4; --legs-soft:#F6EDD2; --cardio-soft:#DDEEE2;
+  --push-soft:#F6E1DE; --pull-soft:#DFE7F4; --legs-soft:#F6EDD2; --cardio-soft:#DDEEE2; --upper:#6A4CB0; --upper-soft:#ECE6F7;
   --ok:#2E8750; --warn:#B7791F; --bad:#C4342A;
   --focus:#2356A3;
   --shadow:0 1px 2px rgba(20,28,40,.06),0 4px 14px rgba(20,28,40,.05);
@@ -28,7 +28,7 @@
     color-scheme:dark;
     --bg:#111317; --surface:#1A1D22; --sunk:#23272D; --ink:#E7E9E5; --muted:#99A1AB; --line:#2E333A;
     --push:#E0544A; --pull:#5B8DDB; --legs:#E5B53A; --cardio:#4DB173;
-    --push-soft:#3A2220; --pull-soft:#1D2A3F; --legs-soft:#3A3120; --cardio-soft:#1C3325;
+    --push-soft:#3A2220; --pull-soft:#1D2A3F; --legs-soft:#3A3120; --cardio-soft:#1C3325; --upper:#9C84E2; --upper-soft:#2A2340;
     --ok:#4DB173; --warn:#E0A544; --bad:#E0544A; --focus:#7FA8EA;
     --shadow:0 1px 2px rgba(0,0,0,.3);
   }
@@ -37,7 +37,7 @@
   color-scheme:dark;
   --bg:#111317; --surface:#1A1D22; --sunk:#23272D; --ink:#E7E9E5; --muted:#99A1AB; --line:#2E333A;
   --push:#E0544A; --pull:#5B8DDB; --legs:#E5B53A; --cardio:#4DB173;
-  --push-soft:#3A2220; --pull-soft:#1D2A3F; --legs-soft:#3A3120; --cardio-soft:#1C3325;
+  --push-soft:#3A2220; --pull-soft:#1D2A3F; --legs-soft:#3A3120; --cardio-soft:#1C3325; --upper:#9C84E2; --upper-soft:#2A2340;
   --ok:#4DB173; --warn:#E0A544; --bad:#E0544A; --focus:#7FA8EA;
   --shadow:0 1px 2px rgba(0,0,0,.3);
 }
@@ -65,7 +65,7 @@ header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background
 .plate{--c:var(--push);flex:none;width:46px;height:46px;border-radius:50%;background:radial-gradient(circle at center,var(--bg) 0 5px,transparent 6px),var(--c);box-shadow:inset 0 0 0 3px rgba(0,0,0,.18),inset 0 0 0 11px var(--c),inset 0 0 0 12px rgba(0,0,0,.2);display:grid;place-items:center}
 .plate span{font:700 11px "Barlow Condensed",sans-serif;color:#fff;transform:translateY(-15px);letter-spacing:.02em}
 .plate.legs span{color:#2A2105}
-.c-push{--c:var(--push);--soft:var(--push-soft)} .c-pull{--c:var(--pull);--soft:var(--pull-soft)} .c-legs{--c:var(--legs);--soft:var(--legs-soft)} .c-cardio{--c:var(--cardio);--soft:var(--cardio-soft)}
+.c-upper{--c:var(--upper);--soft:var(--upper-soft)} .c-push{--c:var(--push);--soft:var(--push-soft)} .c-pull{--c:var(--pull);--soft:var(--pull-soft)} .c-legs{--c:var(--legs);--soft:var(--legs-soft)} .c-cardio{--c:var(--cardio);--soft:var(--cardio-soft)}
 
 .week{display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--surface);border-radius:12px;box-shadow:var(--shadow)}
 .week .big{font:700 34px/1 "Barlow Condensed",sans-serif}
@@ -198,7 +198,7 @@ nav.tabs button[aria-current="page"]{color:var(--ink);background:var(--sunk)}
 .feel.facile{color:var(--ok)} .feel.ok{color:var(--pull)} .feel.dur{color:var(--warn)} .feel.echec{color:var(--bad)}
 
 /* Exercises tab */
-.seg{display:grid;grid-template-columns:repeat(4,1fr);background:var(--sunk);border-radius:10px;padding:3px;gap:3px}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--sunk);border-radius:10px;padding:3px;gap:3px}
 .seg button{border:0;background:none;border-radius:8px;padding:8px 4px;font:600 14px Barlow,sans-serif;color:var(--muted)}
 .seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
 .exl{background:var(--surface);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
@@ -269,6 +269,7 @@ const CATS={
   push:{label:'Push',sub:'Pecs · Triceps · Épaules',plate:'25'},
   pull:{label:'Pull',sub:'Dos · Biceps',plate:'20'},
   legs:{label:'Jambes',sub:'Bas du corps',plate:'15'},
+  upper:{label:'Haut du corps',short:'Haut',sub:'Pecs · Dos · Bras',plate:'10',routine:true,defaultIds:['push-dev-incline','push-supine','push-triceps-poulie','push-skull','pull-pulldown','pull-low-row','pull-preacher','pull-curl-incline']},
   cardio:{label:'Cardio',sub:'Fin de séance',plate:'5'}
 };
 const FEELS=[['facile','Facile'],['ok','OK'],['dur','Dur'],['echec','Échec']];
@@ -303,6 +304,11 @@ const feelLabel=v=>(FEELS.find(x=>x[0]===v)||[])[1]||'';
 function tonnage(s){let t=0;(s.entries||[]).forEach(e=>(e.sets||[]).forEach(x=>{if(x.kg!=null&&x.reps!=null)t+=x.kg*x.reps}));return Math.round(t)}
 function lastDoneOf(cat){const s=sessions.find(x=>x.cat===cat);return s?s.date:null}
 const ROT=['push','legs','pull'];
+const CHOICES=[...ROT,'upper'];
+let routines={};
+// Séance « routine » : liste d'exercices existants (partagés avec Push / Pull), ordre stocké dans routines/<cat>
+function routineOf(cat){if(!(CATS[cat]&&CATS[cat].routine))return exOf(cat);const by={};exercises.forEach(e=>by[e.id]=e);return ((routines[cat]&&routines[cat].ids)||CATS[cat].defaultIds||[]).map(id=>by[id]).filter(Boolean)}
+async function saveRoutine(cat,ids){routines[cat]={...(routines[cat]||{}),ids};render();try{await db.collection('routines').doc(cat).set({ids})}catch(e){toast("Échec de l'enregistrement, réessaie")}}
 // Semaine type : Push, puis Jambes, puis Pull. On propose la première pas encore faite cette semaine.
 function suggestedCat(){const ws=weekStart(new Date());const done=new Set(sessions.filter(s=>parseDate(s.date)>=ws).map(s=>s.cat));return ROT.find(c=>!done.has(c))||'push'}
 function lastSessionOf(cat){return sessions.find(x=>x.cat===cat)||null}
@@ -321,6 +327,7 @@ async function init(){
   db=await c.use('db');
   if(!db){noDb=true;render();return}
   db.collection('exercises').onSnapshot(s=>{exercises=s.docs.map(d=>({id:d.id,...d.data()}));loaded.ex=true;softRender()},e=>{noDb=true;render()});
+  db.collection('routines').onSnapshot(s=>{routines={};s.docs.forEach(d=>routines[d.id]=d.data());softRender()},()=>{});
   db.collection('sessions').orderBy('ts','desc').limit(500).onSnapshot(s=>{sessions=s.docs.map(d=>({id:d.id,...d.data()}));loaded.se=true;softRender()},e=>{noDb=true;render()});
 }
 function softRender(){
@@ -359,28 +366,28 @@ function homeView(){
   const cat=view.homeCat||sug;
   let html='<div class="stack">';
   if(draft){html+=`<div class="banner c-${draft.cat}"><div><div class="eyebrow">Séance en cours</div><strong>${CATS[draft.cat].label} · ${shortDate(draft.date)}</strong></div><button class="btn pri" data-act="resume">Reprendre</button></div>`}
-  html+=`<div class="week"><div><div class="eyebrow">Cette semaine</div><div class="big num">${thisWeek.length}<span style="font-size:20px;color:var(--muted)"> / 3</span></div></div><div class="weekseq">${ROT.map(c=>{const s=thisWeek.find(x=>x.cat===c);return `<span class="c-${c} ${s?'done':''} ${c===sug&&!s?'now':''}"><i></i>${CATS[c].label}</span>`}).join('')}</div></div>`;
-  html+=`<div class="eyebrow" style="margin-top:4px">Quelle séance aujourd'hui ?</div><div class="choices">${ROT.map(c=>{
+  html+=`<div class="week"><div><div class="eyebrow">Cette semaine</div><div class="big num">${thisWeek.length}<span style="font-size:20px;color:var(--muted)"> / 3</span></div></div><div class="weekseq">${[...ROT,...(thisWeek.some(x=>x.cat==='upper')?['upper']:[])].map(c=>{const s=thisWeek.find(x=>x.cat===c);return `<span class="c-${c} ${s?'done':''} ${c===sug&&!s?'now':''}"><i></i>${CATS[c].label}</span>`}).join('')}</div></div>`;
+  html+=`<div class="eyebrow" style="margin-top:4px">Quelle séance aujourd'hui ?</div><div class="choices">${CHOICES.map(c=>{
     const ls=lastSessionOf(c),isDraft=draft&&draft.cat===c,locked=draft&&!isDraft;
     const action=isDraft?`<button class="btn pri sm" data-act="resume">Reprendre</button>`:`<button class="btn pri sm" data-act="start" data-v="${c}" ${locked?'disabled title="Termine d\'abord la séance en cours"':''}>Démarrer</button>`;
     return `<div class="choice c-${c} ${c===cat?'sel':''}"><button class="choice-main" data-act="homecat" data-v="${c}" aria-pressed="${c===cat}">${plate(c)}<span class="choice-txt"><span class="choice-n">${CATS[c].label}${c===sug?'<span class="tag">Prévue</span>':''}</span><span class="choice-s">${CATS[c].sub}</span><span class="choice-s">Dernière : ${ls?relDate(ls.date):'jamais faite'}</span></span></button>${action}</div>`}).join('')}</div>`;
   const ls=lastSessionOf(cat);
-  const list=[...exOf(cat).filter(e=>!e.archived),...exOf('cardio').filter(e=>!e.archived)];
+  const list=[...routineOf(cat).filter(e=>!e.archived),...exOf('cardio').filter(e=>!e.archived)];
   html+=`<div class="c-${cat} stack"><div class="wk-title">${plate(cat)}<div><h1 class="cond" style="font-size:30px;text-transform:uppercase;line-height:1">${CATS[cat].label}</h1><div class="eyebrow">${ls?'Exercices · reprise du '+shortDate(ls.date):'Exercices · première séance'}</div></div></div>`;
-  list.forEach(e=>{html+=ficheHtml(e)});
+  list.forEach(e=>{html+=ficheHtml(e,cat)});
   html+='</div></div>';
   return html;
 }
-function ficheHtml(e){
+function ficheHtml(e,ctx){
   const kind=e.kind||'weight',last=e.last,cc=e.cat==='cardio'?'c-cardio':'';
-  if(view.ficheEdit===e.id)return `<div class="ex fiche ${cc}"><div class="ex-b" style="padding-top:14px">${exForm(e)}</div></div>`;
+  if(view.ficheEdit===e.id)return `<div class="ex fiche ${cc}"><div class="ex-b" style="padding-top:14px">${exForm(e,null,null,ctx)}</div></div>`;
   return `<div class="ex fiche ${cc}"><div class="ex-h" style="cursor:default"><div style="min-width:0"><div class="n">${esc(e.name)}</div><div class="s">${esc([e.muscle,e.machine].filter(Boolean).join(' · '))}</div></div><button class="btn ghost sm" style="margin-left:auto" data-act="fedit" data-v="${e.id}">Modifier</button></div>
   <div class="ex-b">${pastHtml(last,kind)}<section class="today"><div class="sec-h"><span class="sec-t">Séance du jour</span></div>${goalHtml(e.plan,kind)}${e.cues?`<p class="cues">${esc(e.cues)}</p>`:''}</section></div></div>`;
 }
 
 /* ---------- workout ---------- */
 function startWorkout(cat){
-  const list=[...exOf(cat).filter(e=>!e.archived),...exOf('cardio').filter(e=>!e.archived)];
+  const list=[...routineOf(cat).filter(e=>!e.archived),...exOf('cardio').filter(e=>!e.archived)];
   const snap={},entries={};
   list.forEach(e=>{snap[e.id]={name:e.name,machine:e.machine||'',muscle:e.muscle||'',kind:e.kind||'weight',step:num(e.step)??2.5,plan:e.plan||{},last:e.last||null,cues:e.cues||'',cat:e.cat};
     entries[e.id]={sets:[],feel:null,note:'',next:{...(e.plan||{})},nextEdited:false,skipped:false}});
@@ -435,7 +442,7 @@ function exCard(id){
 }
 function pastHtml(last,kind){
   const clock='<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
-  return `<section class="past"><div class="sec-h">${clock}<span class="sec-t">Dernière séance</span>${last?`<span class="sec-d">${shortDate(last.date)} · ${relDate(last.date)}</span>`:''}</div>${last?setsHtml(last.sets,kind)+((last.feel||last.note)?`<div class="past-meta">${last.feel?`<span class="feel ${last.feel}">${feelLabel(last.feel)}</span>`:''}${last.note?`<p>${esc(last.note)}</p>`:''}</div>`:''):'<p>Pas encore de séance enregistrée.</p>'}</section>`;
+  return `<section class="past"><div class="sec-h">${clock}<span class="sec-t">Dernière séance</span>${last?`<span class="sec-d">${shortDate(last.date)}${relDate(last.date).startsWith('le ')?'':' · '+relDate(last.date)}</span>`:''}</div>${last?setsHtml(last.sets,kind)+((last.feel||last.note)?`<div class="past-meta">${last.feel?`<span class="feel ${last.feel}">${feelLabel(last.feel)}</span>`:''}${last.note?`<p>${esc(last.note)}</p>`:''}</div>`:''):'<p>Pas encore de séance enregistrée.</p>'}</section>`;
 }
 function goalHtml(p,kind){
   return `<div class="goal"><span class="eyebrow">Objectif</span><span class="v num">${planGoalHtml(p,kind)}</span>${p&&p.note?`<p>${esc(p.note)}</p>`:''}</div>`;
@@ -532,23 +539,32 @@ function historyView(){
 
 /* ---------- exercises ---------- */
 function exercisesView(){
-  const c=view.exCat;
-  let h=`<div class="stack"><div class="seg" role="group" aria-label="Séance">${Object.keys(CATS).map(k=>`<button data-act="excat" data-v="${k}" aria-pressed="${c===k}">${CATS[k].label}</button>`).join('')}</div>`;
-  const list=exOf(c);
-  list.filter(e=>!e.archived).forEach((e,i,arr)=>{h+=exRow(e,i,arr)});
+  const c=view.exCat,isRt=!!CATS[c].routine;
+  let h=`<div class="stack"><div class="seg" role="group" aria-label="Séance">${Object.keys(CATS).map(k=>`<button data-act="excat" data-v="${k}" aria-pressed="${c===k}">${CATS[k].short||CATS[k].label}</button>`).join('')}</div>`;
+  if(isRt)h+=`<p class="hint">Séance composée d'exercices de tes autres séances : charges, objectifs et historique sont partagés.</p>`;
+  const list=routineOf(c);
+  list.filter(e=>!e.archived).forEach((e,i,arr)=>{h+=exRow(e,i,arr,c)});
+  if(isRt){
+    const inRt=new Set(list.map(e=>e.id));
+    const avail=exercises.filter(e=>!e.archived&&e.kind!=='cardio'&&!inRt.has(e.id));
+    h+=view.adding?`<div class="stack" style="background:var(--surface);border-radius:12px;padding:14px;box-shadow:var(--shadow)"><label class="f">Exercice à ajouter<select id="rt-pick">${ROT.map(k=>{const xs=avail.filter(e=>e.cat===k).sort(byOrder);return xs.length?`<optgroup label="${CATS[k].label}">${xs.map(e=>`<option value="${e.id}">${esc(e.name)}</option>`).join('')}</optgroup>`:''}).join('')}</select></label><div class="row"><button class="btn pri sm c-${c}" data-act="rt-add" ${avail.length?'':'disabled'}>Ajouter</button><button class="btn sm" data-act="ef-cancel">Fermer</button></div></div>`
+      :`<button class="btn" data-act="add">+ Ajouter un exercice existant</button>`;
+    return h+'</div>';
+  }
   if(view.adding)h+=exForm(null);
   else h+=`<button class="btn" data-act="add">+ Ajouter un exercice ${CATS[c].label}</button>`;
   const arch=list.filter(e=>e.archived);
   if(arch.length){h+=`<div class="eyebrow" style="margin-top:8px">Retirés de la séance</div>`;arch.forEach(e=>{h+=`<div class="exl archived"><div class="exl-h"><div class="n">${esc(e.name)}</div><button class="btn sm" style="margin-left:auto" data-act="unarchive" data-v="${e.id}">Remettre</button></div></div>`})}
   return h+'</div>';
 }
-function exRow(e,i,arr){
+function exRow(e,i,arr,ctx){
   const open=view.editId===e.id;
   let h=`<div class="exl c-${e.cat}"><button class="exl-h" data-act="edit" data-v="${e.id}" aria-expanded="${open}"><div><div class="n">${esc(e.name)}</div><div class="hint">${esc([e.muscle,e.machine].filter(Boolean).join(' · '))}</div></div><span class="p num">${planText(e.plan,e.kind)}</span></button>`;
-  if(open){h+=`<div class="exl-b">${exForm(e,i,arr)}<button class="btn sm" data-act="gochart" data-v="${e.id}">Voir la courbe →</button></div>`}
+  if(open){h+=`<div class="exl-b">${exForm(e,i,arr,ctx)}<button class="btn sm" data-act="gochart" data-v="${e.id}">Voir la courbe →</button></div>`}
   return h+'</div>';
 }
-function exForm(e,i,arr){
+function exForm(e,i,arr,ctx){
+  const rt=ctx&&CATS[ctx]&&CATS[ctx].routine;
   const x=e||{name:'',muscle:'',machine:'',step:2.5,plan:{},cues:'',kind:view.exCat==='cardio'?'cardio':'weight'};
   const p=x.plan||{},cardio=x.kind==='cardio';
   let h=`<div class="stack" ${e?'':'style="background:var(--surface);border-radius:12px;padding:14px;box-shadow:var(--shadow)"'}>${e?'':'<strong class="cond" style="font-size:19px">Nouvel exercice</strong>'}
@@ -561,7 +577,8 @@ function exForm(e,i,arr){
   h+=`<label class="f">Technique / rappels<textarea id="ef-cues" rows="2">${esc(x.cues)}</textarea></label><div class="row"><button class="btn pri sm c-${e?e.cat:view.exCat}" data-act="ef-save" data-v="${e?e.id:''}">${e?'Enregistrer':'Ajouter'}</button><button class="btn sm" data-act="ef-cancel">Fermer</button>`;
   if(e&&arr){h+=`<span style="margin-left:auto" class="row"><button class="btn ghost sm" data-act="move" data-v="${e.id}" data-d="-1" ${i===0?'disabled':''} aria-label="Monter">↑</button><button class="btn ghost sm" data-act="move" data-v="${e.id}" data-d="1" ${i===arr.length-1?'disabled':''} aria-label="Descendre">↓</button></span>`}
   h+='</div>';
-  if(e)h+=view.confirmArchive===e.id?`<div class="confirm"><p>Retirer « ${esc(e.name)} » de la séance ${CATS[e.cat].label} ? L'historique est conservé.</p><div class="row"><button class="btn sm" data-act="arch-no">Annuler</button><button class="btn danger sm" data-act="arch-yes" data-v="${e.id}">Retirer</button></div></div>`:`<div><button class="btn ghost sm" data-act="arch" data-v="${e.id}">Retirer de la séance</button></div>`;
+  if(e&&rt)h+=`<div><button class="btn ghost sm" data-act="rt-remove" data-v="${e.id}" data-c="${ctx}">Retirer de ${CATS[ctx].label}</button></div>`;
+  else if(e)h+=view.confirmArchive===e.id?`<div class="confirm"><p>Retirer « ${esc(e.name)} » de la séance ${CATS[e.cat].label} ? L'historique est conservé.</p><div class="row"><button class="btn sm" data-act="arch-no">Annuler</button><button class="btn danger sm" data-act="arch-yes" data-v="${e.id}">Retirer</button></div></div>`:`<div><button class="btn ghost sm" data-act="arch" data-v="${e.id}">Retirer de la séance</button></div>`;
   return h+'</div>';
 }
 function readForm(){
@@ -581,6 +598,7 @@ async function saveEx(id){
   }catch(e){toast("Échec de l'enregistrement, réessaie")}
 }
 async function moveEx(id,dir){
+  if(CATS[view.exCat].routine){const ids=routineOf(view.exCat).map(e=>e.id);const i=ids.indexOf(id),j=i+dir;if(i<0||j<0||j>=ids.length)return;[ids[i],ids[j]]=[ids[j],ids[i]];view.editId=id;await saveRoutine(view.exCat,ids);return}
   const list=exOf(view.exCat).filter(e=>!e.archived);const i=list.findIndex(e=>e.id===id);const j=i+dir;if(j<0||j>=list.length)return;
   const a=list[i],b=list[j];const oa=a.order??i,ob=b.order??j;
   try{await db.collection('exercises').doc(a.id).update({order:ob===oa?oa+dir:ob});await db.collection('exercises').doc(b.id).update({order:oa})}catch(e){toast('Échec du déplacement')}
@@ -719,6 +737,8 @@ document.addEventListener('click',async ev=>{
     case 'chmetric':view.chMetric=v;render();break;
     case 'gmetric':view.gMetric=v;render();break;
     case 'gochart':{const ex=exercises.find(e=>e.id===v);view.tab='charts';view.chMode='ex';view.chCat=ex?ex.cat:'push';view.editId=null;render();const el=document.getElementById('ch-'+v);if(el)el.scrollIntoView({block:'start'});break}
+    case 'rt-add':{const sel=document.getElementById('rt-pick');if(!sel||!sel.value)break;const c=view.exCat;const ids=routineOf(c).map(e=>e.id);ids.push(sel.value);view.adding=false;await saveRoutine(c,ids);toast('Exercice ajouté à '+CATS[c].label);break}
+    case 'rt-remove':{const c=b.dataset.c;const ids=routineOf(c).map(e=>e.id).filter(x=>x!==v);view.editId=null;view.ficheEdit=null;await saveRoutine(c,ids);toast('Retiré de '+CATS[c].label);break}
     case 'excat':view.exCat=v;view.editId=null;view.adding=false;render();break;
     case 'edit':view.editId=view.editId===v?null:v;view.adding=false;view.confirmArchive=null;render();break;
     case 'add':view.adding=true;view.editId=null;render();{const el=document.getElementById('ef-name');if(el)el.focus()}break;

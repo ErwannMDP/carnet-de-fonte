@@ -1,7 +1,7 @@
 /* Carnet de fonte : fonctionnement hors ligne.
    Les pages sont prises sur le réseau quand il y en a (pour recevoir les mises à jour),
    sinon dans le cache. Changez VERSION à chaque mise à jour pour forcer un rafraîchissement. */
-const VERSION = 'cdf-v3';
+const VERSION = 'cdf-v4';
 const CORE = ['./', 'index.html', 'store.js', 'seed.js', 'manifest.webmanifest',
   'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png'];
 
